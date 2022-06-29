@@ -1,21 +1,21 @@
-/* SET-UP
+-- SET-UP
 
-Data used: a dataset containing data scrapped from Kickstarted website at the begining of 2018
-Licence: CC BY-NC-SA 4.0
-Obteained from: https://www.kaggle.com/kemical/kickstarter-projects
-
-Skills used: Data Import, Setting Table Relationships, Date Formatting
-*/
+-- Skills used: Data Import, Setting Table Relationships, Date Formatting
 
 USE kickstarter;
 
--- adjusting settings to be able to import a local file
+-- adjusting settings so that I can import a local file.
 
 SHOW GLOBAL VARIABLES LIKE 'local_infile';
 SET GLOBAL local_infile = true;
 
-/* loading the Kickstarter dataset. I've attempted to do this using Workbench's Import Wizard at first,
-but it didn't work fully. It did create the right tables though, I just need to popualte it with data. */
+/* Loading the Kickstarter dataset. There are two tables I will be working with - one containing basic decriptive information about
+a project, and another containing the data regarding the projects' success - the goal, support received,
+and its status.
+
+I've initially attempted using Workbench's Import Wizard, but it seemed to struggle with 
+excessively long project names and would only create empty tables. In the end I've resorted to
+loading the data manually into those empty tables.*/
 
 LOAD DATA LOCAL INFILE 'C:\\...\\project_info.csv' INTO TABLE project_info
 FIELDS TERMINATED BY ',' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
@@ -23,10 +23,11 @@ FIELDS TERMINATED BY ',' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
 LOAD DATA LOCAL INFILE 'C:\\...\\pledge.csv' INTO TABLE pledge
 FIELDS TERMINATED BY ',' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
 
-/* loading country 'name - country code' reference table. I have copied the code from
-here https://dyclassroom.com/reference-database/mysql-country-name-and-country-code-list 
-and use it to get full country names instead of codes, which weren't available in 
-kickstarter dataset */
+/* One of the fields contains information about the country where the project was launched, however it
+is stored as a contry code, e.g. "US". I want to be able to see full country names, and for that reason I will
+create a third table that I can use as a country code - country name reference.
+
+The code for this table was found here https://dyclassroom.com/reference-database/mysql-country-name-and-country-code-list  */
 
 
 CREATE TABLE IF NOT EXISTS `country` (
@@ -37,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `country` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `country`
+-- Dumping data into table `country`
 --
 
 INSERT INTO `country` (`countrycode`, `countryname`, `code`)
@@ -293,7 +294,7 @@ VALUES
 ('ZMB','Zambia','ZM'),
 ('ZWE','Zimbabwe','ZW');
 
--- checking if imported correctly, and if line number matches
+-- checking if imported correctly, and if line number matches.
 
 SELECT 
     *
@@ -315,14 +316,14 @@ SELECT
 FROM
     project_info;
 
--- setting the relationship between the tables
+-- All seems good. Setting the relationship between the tables:
 ALTER TABLE project_info
 ADD PRIMARY KEY (ID);
 
 ALTER TABLE pledge
 ADD FOREIGN KEY (ID) REFERENCES project_info (ID) ON DELETE CASCADE;
 
--- formatting the dates
+-- formatting the dates:
 
 UPDATE project_info 
 SET 
