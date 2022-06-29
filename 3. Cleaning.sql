@@ -1,6 +1,6 @@
 /* CLEANING
 
-Skills Used: String Manipulation, Conditionals (IFNULL, CASE WHEN), Joins, Aggregate Functions
+Skills Used: String Manipulation, Conditionals (IFNULL, CASE WHEN), Joins, Aggregate Functions.
 
 1. Adding a separate column with just the launch year, as I will not be looking at months and days.
 */
@@ -12,10 +12,10 @@ UPDATE project_info
 SET 
     launched_date = YEAR(launched);
 
-/* 2. During the scraping process some country info was corrupted. I will populate missing data
-as much as I can from currency */
+/* 2. During the scraping process some country data was corrupted. I will populate the missing data
+as much as I can from currency. */
 
--- First, settin corrupted data into Null which will allow me to use IFNULL later
+-- First, setting corrupted data to 'Null' which will allow me to use IFNULL later:
 
 UPDATE project_info 
 SET 
@@ -23,7 +23,7 @@ SET
 WHERE
     country = '"N';
 
--- Checking the query before updating the table
+-- Checking the query before updating the table:
 
 SELECT 
     pr.country,
@@ -37,10 +37,11 @@ WHERE
     pr.country IS NULL;
 
 /* Updating the table. Some countries with corrupted values were using Euros, which makes it impossible to
-know the country for certain. I will leave it as 'Unknown' */
+know the country for certain. I will leave it as 'Unknown'. I could also create a separate field
+for specifying continents, but I will not do it this time and will focus on countries instead. */
 
 UPDATE project_info pr
-        JOIN
+    JOIN
     pledge p ON pr.ID = p.ID 
 SET 
     pr.country = CASE
@@ -60,9 +61,10 @@ FROM
     pledge p ON pr.ID = p.ID
 GROUP BY country, currency;
 
--- Looks good. There are 186 projects from unknown countries in Europe.
+/* Looks good. There are 186 projects from unknown countries in Europe. Given the size of the dataset, 
+this number should not affect the overall results if they are excluded. */
 
--- 3. Now, I will merge "failed", "cancelled", and "suspended" categories into one "failed" and "live" plus "undefined" into "other".
+-- 3. Now, I will merge "failed", "cancelled", and "suspended" categories into one "failed"; and "live" plus "undefined" into "other".
 
 ALTER TABLE pledge
 ADD COLUMN state_merged varchar(50);
