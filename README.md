@@ -9,4 +9,4 @@ There are 4 parts to the porject during which I:
 1. Set up the environment,
 2. Familiarise with the data,
 3. Clean the data,
-4. Have a deeper dive and export separate files to be used with Tableu in a later visualisation.
+4. Have a deeper dive and export separate files to be used with Tableau in a later visualisation.
